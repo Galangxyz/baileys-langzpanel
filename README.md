@@ -1,11 +1,13 @@
 # baileys-langzpanel
 
-**baileys-langzpanel** adalah modifikasi dari [Baileys](https://github.com/WhiskeySockets/Baileys), sebuah library WhatsApp Web API berbasis Node.js yang mendukung multi-device. Proyek ini dibuat ulang agar lebih mudah digunakan dan dipahami, dengan penambahan dokumentasi, konfigurasi TypeScript, dan struktur yang rapi.
+**baileys-langzpanel** adalah modifikasi dari [Baileys](https://github.com/WhiskeySockets/Baileys), sebuah library WhatsApp Web API berbasis Node.js yang powerful.
 
 Proyek ini cocok untuk:
 - Developer bot WhatsApp
-- Integrator sistem (untuk login via WhatsApp, notifikasi dll)
+- Integrator sistem (untuk login via WhatsApp, notifikasi, dll)
 - Belajar reverse engineering WhatsApp Web
+
+---
 
 ## Instalasi
 
@@ -17,6 +19,9 @@ npm install baileys-langzpanel
 Atau dengan Yarn:
 
 yarn add baileys-langzpanel
+
+
+---
 
 Fitur Utama
 
@@ -31,6 +36,9 @@ WAProto dan SignalGroup: Sudah termasuk file protokol dan modul signal.
 QR Scanner bawaan: Bisa langsung cetak QR ke terminal.
 
 
+
+---
+
 Struktur Direktori
 
 baileys-langzpanel/
@@ -43,6 +51,9 @@ baileys-langzpanel/
 ├── tsconfig.json          # Konfigurasi TypeScript
 ├── package.json
 └── README.md
+
+
+---
 
 Contoh Penggunaan
 
@@ -78,42 +89,111 @@ sock.ev.on('messages.upsert', async (m) => {
   }
 })
 
-Build Manual
 
-Kalau kamu mau kontribusi atau memodifikasi source-nya, compile dulu dengan:
+---
 
-npm run build:tsc
+Fitur Tambahan Button Support
 
-Untuk membangun dokumentasi secara otomatis:
+baileys-langzpanel menyediakan berbagai jenis tombol interaktif untuk memperkaya pengalaman pengguna bot, di antaranya:
 
-npm run build:docs
+1. CTA Copy Button (cta_copy)
 
-Cara Menyimpan Session Login
+Mengirim tombol yang ketika diklik langsung menyalin teks ke clipboard.
 
-Gunakan useSingleFileAuthState untuk menyimpan session di file. Kamu bisa juga ganti dengan database jika lebih kompleks.
+Contoh:
 
-import { useSingleFileAuthState } from 'baileys-langzpanel/lib/Auth'
+{
+  name: "cta_copy",
+  buttonParamsJson: JSON.stringify({
+    display_text: "Copy Code",
+    copy_code: "Ini adalah teks yang disalin"
+  })
+}
 
-const { state, saveState } = useSingleFileAuthState('./auth_info.json')
 
-Pastikan untuk memanggil saveState() saat koneksi atau session berubah agar data tersimpan.
+---
 
-Troubleshooting
+2. Hydrated Buttons
 
-Q: QR code tidak muncul?
-A: Pastikan printQRInTerminal: true dan tidak ada session aktif sebelumnya.
+Tombol interaktif WhatsApp yang lebih fleksibel, seperti:
 
-Q: Koneksi terputus terus?
-A: Cek apakah jaringan stabil dan pastikan nomor WA tidak logout dari perangkat.
+URL Button (membuka tautan)
 
-Q: Saya ingin pakai database untuk auth?
-A: Bisa! Tapi perlu sedikit modifikasi di auth handler-nya (multiFileAuthState, custom adapter, dll).
+Call Button (langsung menelepon)
 
-Kontribusi
+Quick Reply Button (mengirim perintah otomatis)
 
-Pull Request dan issue sangat diterima! Proyek ini terbuka untuk siapa saja yang ingin membantu memperbaiki bugs, menambah fitur, atau memperbarui dokumentasi.
+
+Contoh:
+
+hydratedButtons: [
+  { urlButton: { displayText: "Kunjungi Website", url: "https://example.com" } },
+  { callButton: { displayText: "Hubungi Kami", phoneNumber: "+62123456789" } },
+  { quickReplyButton: { displayText: "Cek Status", id: ".status" } }
+]
+
+
+---
+
+3. Legacy Buttons (Buttons Message)
+
+Tipe tombol klasik dari WhatsApp, maksimal 3 pilihan, cocok untuk flow sederhana.
+
+Contoh:
+
+buttons: [
+  { buttonId: ".list", buttonText: { displayText: "Lihat Produk" }, type: 1 },
+  { buttonId: ".order", buttonText: { displayText: "Pesan Sekarang" }, type: 1 },
+  { buttonId: ".info", buttonText: { displayText: "Informasi" }, type: 1 }
+]
+
+
+---
+
+Dukungan Media
+
+Semua jenis tombol di atas bisa disertai media gambar, baik dari file lokal atau URL:
+
+Contoh upload gambar:
+
+const media = await prepareWAMessageMedia({
+  image: { url: './src/media/gambar.jpg' }
+}, { upload: sock.waUploadToServer })
+
+
+---
+
+Metadata Pesan
+
+baileys-langzpanel juga mendukung pengaturan metadata tambahan seperti:
+
+externalAdReply
+
+forwardedNewsletterMessageInfo
+
+businessMessageForwardInfo
+
+contextInfo untuk tag user (mention) atau promosi.
+
+
+
+---
+
+Catatan
+
+Pastikan WhatsApp yang digunakan sudah versi terbaru (multi-device).
+
+Perlu Node.js minimal v16.0.0 ke atas untuk performa terbaik.
+
+
+
+---
 
 Lisensi
 
 MIT License
-Dikembangkan oleh Galang
+
+
+---
+
+© 2025 LangzPanel – dibuat oleh Galangxyz
